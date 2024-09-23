@@ -12,13 +12,14 @@ class DayWiseScheduleListController extends GetxController {
   bool showScrollToTopButton = false;
   bool activeSendButton = false;
 
+
+
   @override
   void onInit() {
     super.onInit();
     if (Get.arguments != null) {
       if (Get.arguments["appointments"].runtimeType == List<Appointment>) {
         todayAppointments = Get.arguments["appointments"];
-        todayAppointments.sort((a, b) => a.startTime.compareTo(b.startTime)); // Sort appointments by start time
       }
 
       if (Get.arguments["selectedDay"].runtimeType == String) {
@@ -26,4 +27,15 @@ class DayWiseScheduleListController extends GetxController {
       }
     }
   }
+
+  List<Appointment> getAppointmentsForTime(DateTime time) {
+    return todayAppointments.where((appointment) {
+      // Check if the appointment starts in the same hour of the day as the given time slot
+      return appointment.startTime.year == time.year &&
+          appointment.startTime.month == time.month &&
+          appointment.startTime.day == time.day &&
+          appointment.startTime.hour == time.hour;
+    }).toList();
+  }
+
 }

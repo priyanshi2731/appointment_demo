@@ -36,12 +36,6 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
     }
   }
 
-  List<Appointment> _getAppointmentsForTime(DateTime time) {
-    return controller.todayAppointments.where((appointment) {
-      return appointment.startTime.isAtSameMomentAs(time); // Check if both DateTime objects are the same
-    }).toList();
-  }
-
   void scrollToFirstDay() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.scrollController.animateTo(
@@ -62,11 +56,11 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
         title: UiUtils.fadeSwitcherWidget(
           duration: const Duration(milliseconds: 300),
           child: Text(
-            "${controller.selectedDay}",
+            controller.selectedDay,
             style: TextStyle(
               fontSize: 18.sp,
               fontWeight: FontWeight.w600,
-              color: Color(0xFFFF4E00),
+              color: const Color(0xFFFF4E00),
             ),
           ),
         ),
@@ -119,9 +113,9 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
                       itemBuilder: (context, index) {
                         DateTime day = controller.allHoursInDay[index];
 
-                        // controller.todayAppointments = _getAppointmentsForTime(day);
-                        debugPrint("$day");
+                        List<Appointment> appointmentsForTime = controller.getAppointmentsForTime(day);
 
+                        debugPrint("======$day");
                         debugPrint("${controller.todayAppointments.length}");
 
                         return Row(
@@ -132,7 +126,7 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
                               child: Container(
                                 padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 12),
                                 decoration: BoxDecoration(
-                                  border: controller.todayAppointments.isEmpty
+                                  border: appointmentsForTime.isEmpty
                                       ? Border(
                                           right: BorderSide(color: Colors.grey.shade200),
                                         )
@@ -175,14 +169,14 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
                               flex: 4,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  border: controller.todayAppointments.isNotEmpty
+                                  border: appointmentsForTime.isNotEmpty
                                       ? Border(
                                           left: BorderSide(color: Colors.grey.shade200),
                                         )
                                       : null,
                                 ),
                                 alignment: Alignment.center,
-                                child: controller.todayAppointments.isNotEmpty
+                                child: appointmentsForTime.isNotEmpty
                                     ? ListView.separated(
                                         shrinkWrap: true,
                                         physics: const NeverScrollableScrollPhysics(),
@@ -195,8 +189,8 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
                                           return Container(
                                             margin: const EdgeInsets.only(left: 3),
                                             decoration: BoxDecoration(
-                                              border: controller.todayAppointments.isNotEmpty
-                                                  ? Border(
+                                              border: appointmentsForTime.isNotEmpty
+                                                  ? const Border(
                                                       left: BorderSide(
                                                         color: Colors.green,
                                                         width: 2.3,
@@ -261,7 +255,9 @@ class _DayWiseScheduleListState extends State<DayWiseScheduleList> {
                                           );
                                         },
                                       )
-                                    : const SizedBox(),
+                                    : const SizedBox(
+                                        child: CircularProgressIndicator(),
+                                      ),
                               ),
                             ),
                           ],
